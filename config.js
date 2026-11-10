@@ -62,7 +62,7 @@
   const m = (x, dp) => root.DeskEngine.h.money(x, dp);
   const sgn = (x) => (x >= 0 ? '+' : '−') + m(Math.abs(x));
   const pc = (x) => Math.round(x * 100) + '%';
-  const CLOSE = 'Close, but not exact. Redo the arithmetic with the calculator.';
+  const CLOSE = 'Close, but not exact. Redo the arithmetic in Desmos.';
 
   /* Every judged cell: its exact answer, the wrong answers it diagnoses, and the judge options. judgeTask uses these, and
      buildTasks rejects any seed where two of a cell's values (or a value and the sign-flipped answer) would be confused. */
@@ -337,8 +337,8 @@
     app: 'finan4-u6-cash-flow-desk', version: 2, seedVersion: 2, salt: 'rize-finan4-u6-cashflow:7b19e4', points: 20,
     storageKey: 'rize-finan4-u6-cashflow-v2', filePrefix: 'RelevantOrNot',
     verifyUrl: 'https://rizecomputerscience.github.io/finan4-cash-flow-desk/verify.html',
-    calcPlaceholder: '300000/10*0.2',
-    calcHint: 'Type or tap. Use * to multiply and / to divide, so 300000/10*0.2 is the yearly tax saving from depreciating $300,000 over 10 years at a 20% tax rate.',
+    calcPlaceholder: '300000*0.2/10',
+    calcHint: 'Type or tap. Use * to multiply and / to divide, so 300000*0.2/10 is the yearly tax saving from depreciating $300,000 over 10 years at a 20% tax rate.',
     story: { title: 'Relevant or Not?', kicker: 'Corporate Finance, Unit 6', company: 'Ironbark Sporting Goods', team: 'Finance',
       from: 'Wendell Achebe', fromTitle: 'finance director, Ironbark Sporting Goods',
       dek: 'You have joined the finance team at Ironbark Sporting Goods, a chain of sporting-goods stores. Wendell Achebe, the finance director, is deciding whether to open a new store. Everyone has an item they want counted. Your job is to decide which items belong in the store’s cash flows, then build the rows he will discount.',
