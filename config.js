@@ -1,351 +1,278 @@
 /* Relevant or Not?: FINAN IV Unit 6 (which cash flows count). Config for lib/coursedev/desk-engine.
    Names swept for reuse 2026-11-04 (case_reuse.py): Ironbark Sporting Goods, Wendell Achebe, both clean.
-   Rework 2026-11-06 (Samuel's 11/05 desk rules, design/course-principles.md): a short worked example opens every task (engine
-   `example`), each question sits right above its own field (value labels and `parts`), round seeds (every amount a multiple of
-   $5,000 or $10,000), formulas name every cell, no tolerance sentences, more wrong answers diagnosed with the student's own
-   numbers, and seeds rejected when two diagnosed answers would collide. No step lacks a right answer, so none uses `autosave`;
-   the desk is fictional, so there are no citations to fold into `sources`. seedVersion and version moved to 2, so saved
-   progress and receipts from v1 do not carry over. */
+   Version 3 (2026-11-12), rebuilt to the Unit 9 pattern (process/standards/interactive-assignments.md rules 25 to 39;
+   u06/TEACHING-MAP.md; design/ROLLOUT-BRIEF-2026-11-12.md):
+   - The reading teaches; the desk has no walkthrough of its own (rule 32).
+   - Every task states the problem first, then shows a worked example drawn as the SAME table the student fills, read-only, with
+     other numbers (h.ladder, rule 29). A faded step leaves one or two lines blank; the next step leaves every line blank.
+   - Cut from the desk (teach-the-minimum test: no exam question, project step or later unit needs them): working capital (two
+     steps and a check) and financing costs (loan interest, a step part and a check).
+   - Added: hiring and training staff as a start-up cost that counts but is not depreciated (project kit Step 1 has a pre-opening
+     cost row), and the NPV and open-or-pass decision as the last step, on the annuity factor from Units 4 and 5.
+   The previous version is in v2-archive/. seedVersion 3 and version 3: progress and receipts from v2 do not carry over. */
 (function (root) {
   'use strict';
   const QUIZ = [
-    { title: 'Quick win: the one question',
-      q: 'Wendell asks the same question about every item someone wants to put in a new store’s cash flows. Which question is it?',
-      options: ['If Ironbark opens this store, does the company’s cash change because of this item?', 'Does this item appear on the income statement?', 'Is this item bigger than $10,000?', 'Did someone at head office approve this item?'],
+    { title: 'Quick check: a new manager',
+      q: 'If the plaza store opens, Ironbark will hire one more district manager at $90,000 a year, and head office will pay her salary. Does the salary belong in the store’s cash flows?',
+      options: ['Yes. Ironbark’s cash changes because the store opens', 'No. Head-office costs are overhead, so they stay out', 'No. Head office pays it, not the store', 'Only in years when the store makes a profit'],
       answer: 0,
-      why: ['Right. An item belongs in the store’s cash flows only if opening the store changes the company’s cash because of it. Everything else stays out, however official it looks.',
-        'Plenty of income statement lines, like depreciation, are not cash, and some cash, like a lost rent check, never shows up on the store’s income statement. Ask whether the company’s cash changes because the store opens.',
-        'Size does not decide it. A small item that the store causes counts, and a large one that would happen anyway does not.',
-        'An approval does not make an item relevant. Ask whether the company’s cash changes because the store opens.'] },
-    { title: 'Quick win: leave the loan out',
-      q: 'A bank will lend Ironbark part of the money for the new store. Why does the loan’s interest stay out of the store’s cash flows?',
-      options: ['The discount rate already charges the store for using money, so subtracting interest as well would count that cost twice', 'Interest is not a real cost', 'The bank pays the interest, not Ironbark', 'Interest is paid only in the first year'],
-      answer: 0,
-      why: ['Right. Discounting at the required rate already charges the store for the money tied up in it. How Ironbark pays for the store is a separate decision, so interest stays out.',
-        'Interest is a real cost to Ironbark. It stays out of the store’s cash flows because the discount rate already charges the store for using money.',
-        'Ironbark pays the bank. The interest stays out because the discount rate already charges the store for using money.',
-        'Interest is paid every year the loan is outstanding. It stays out because the discount rate already charges the store for using money.'] },
-    { title: 'Quick win: working capital comes back',
-      q: 'The new store ties up cash in products on its shelves. Why does that cash show up again as a cash inflow in the store’s last year?',
-      options: ['When the store closes, it sells its remaining products and pays off its suppliers, which frees the cash that was tied up', 'The government refunds it', 'It has been depreciated to zero by then', 'It does not come back; working capital is a yearly cost like rent'],
-      answer: 0,
-      why: ['Right. The products on the shelves are cash in another form. At the end the store sells them and settles its supplier bills, so the cash returns.',
-        'No refund is involved. The cash comes back because the store sells its last products and pays off its suppliers.',
-        'Inventory is not depreciated. The store sells its last products when it closes, and that returns the cash.',
-        'Working capital is paid once, at the start, and returned at the end. Rent is paid every year and never comes back.'] },
+      why: ['Right. Ask the one question: does Ironbark’s cash change because the store opens? The salary is paid only if it opens, so it counts.',
+        'Overhead stays out only when head office costs the same either way. This salary is new, and it exists only because the store opens.',
+        'Who writes the check does not matter. Ironbark pays $90,000 a year more because the store opens, so it counts.',
+        'The salary is paid every year the store is open, profit or not. It counts every year.'] },
     { title: 'Exam-style question',
-      q: 'A competitor spends $200,000 on fixtures for a new store and depreciates them evenly over 5 years. Its tax rate is 25%. How much does depreciation save it in taxes each year?',
-      options: ['$10,000', '$50,000', '$40,000', '$30,000'],
+      q: 'A competitor spends $240,000 on fixtures for a new store and depreciates them evenly over 6 years. Its tax rate is 21%. How much does depreciation save it in taxes each year?',
+      options: ['$8,400', '$50,400', '$40,000', '$31,600'],
       answer: 0,
-      why: ['Right. Depreciation each year = $200,000 ÷ 5 = $40,000, and the tax saving = $40,000 × 25% = $10,000 a year. Questions on the exams look like this one.',
-        '$50,000 is 25% of the full $200,000. The cost is spread over 5 years, so each year’s depreciation is $40,000, and the saving is 25% of that.',
-        '$40,000 is the depreciation itself. The tax saving is the tax rate times the depreciation: $40,000 × 25%.',
-        '$30,000 multiplies the depreciation by 75%. Multiply by the tax rate, 25%, instead.'] },
+      why: ['Right. Depreciation each year = $240,000 ÷ 6 = $40,000, and the tax saving = $40,000 × 21% = $8,400. Questions on the exams look like this one.',
+        '$50,400 is 21% of the whole $240,000. Spread the cost over 6 years first: $40,000 a year, then × 21%.',
+        '$40,000 is the depreciation itself. The tax saving is depreciation × tax rate: $40,000 × 21%.',
+        '$31,600 multiplies the depreciation by 79%. Multiply by the tax rate, 21%, instead.'] },
   ];
 
   const STEPS = [
-    { id: 'walk', label: 'Worked example', kind: 'walk' },
-    { id: 'q1', label: 'Check 1', kind: 'check', quiz: 0 },
-    { id: 't1', label: 'Start-up cash', kind: 'task' },
-    { id: 't2', label: 'The nearby store', kind: 'task' },
-    { id: 't3', label: 'The building', kind: 'task' },
-    { id: 'q2', label: 'Check 2', kind: 'check', quiz: 1 },
-    { id: 't4', label: 'Taxes', kind: 'task' },
-    { id: 't5', label: 'Working capital', kind: 'task' },
-    { id: 'q3', label: 'Check 3', kind: 'check', quiz: 2 },
-    { id: 't6', label: 'The cash flows', kind: 'task' },
-    { id: 'q4', label: 'Exam-style question', kind: 'check', quiz: 3 },
+    { id: 'open', label: 'Start-up cash', kind: 'task' },
+    { id: 'yearly', label: 'Each year', kind: 'task' },
+    { id: 'q1', label: 'Quick check', kind: 'check', quiz: 0 },
+    { id: 'tax1', label: 'Outlet taxes', kind: 'task' },
+    { id: 'tax2', label: 'Plaza taxes', kind: 'task' },
+    { id: 'cf1', label: 'Outlet NPV', kind: 'task' },
+    { id: 'cf2', label: 'Open or pass?', kind: 'task' },
+    { id: 'q2', label: 'Exam-style question', kind: 'check', quiz: 1 },
     { id: 'note', label: 'Your note', kind: 'note' },
   ];
-  const LIFE = 5, LOAN_RATE = 0.05;
+  const LIFE = 5;
+  // The reading's worked-example answers (coffee shop). No seeded answer may equal one of them.
+  const READING = [220000, 64000, 16000, 40000, 10000, 54000, 204703, -220000, -15297];
 
-  const m = (x, dp) => root.DeskEngine.h.money(x, dp);
-  const sgn = (x) => (x >= 0 ? '+' : '−') + m(Math.abs(x));
+  const H = () => root.DeskEngine.h;
+  // Same output as the engine's money() for whole dollars, without toLocaleString (too slow for the 4,000-email test).
+  const m = (x) => { const v = Math.round(x); return (v < 0 ? '−$' : '$') + String(Math.abs(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); };
   const pc = (x) => Math.round(x * 100) + '%';
-  const CLOSE = 'Close, but not exact. Redo the arithmetic in Desmos.';
+  const af4 = (r) => Math.round(H().annuityFactor(r, LIFE) * 10000) / 10000;
+  const f4 = (x) => x.toFixed(4);
 
-  /* Every judged cell: its exact answer, the wrong answers it diagnoses, and the judge options. judgeTask uses these, and
-     buildTasks rejects any seed where two of a cell's values (or a value and the sign-flipped answer) would be confused. */
-  function cells(t) {
-    const BF = t.B + t.F, X = t.P - t.E;
-    return {
-      t1: { exact: BF, diag: [
-        [BF + t.S, 'sunk', () => `The market survey was paid last spring. That ${m(t.S)} is gone whether or not the store opens, so leave it out.`],
-        [t.B, 'nofix', () => `The ${m(t.F)} of fixtures and checkout counters is spent only if the store opens, so count it too.`],
-        [t.F, 'nobuild', () => `The ${m(t.B)} build-out is spent only if the store opens, so count it too.`]],
-        opts: () => ({ otherMsg: 'Count each item that is spent only if the store opens. Leave out anything already paid.' }) },
-      t2: { exact: X, diag: [
-        [t.P, 'erosion', () => `The nearby store’s lost profit happens only because the new store opens, so subtract it: ${m(t.P)} − ${m(t.E)}.`],
-        [X - t.A, 'overhead', () => `Head office costs the same whether or not this store opens. Charging the store ${m(t.A)} moves the cost around but does not change Ironbark’s cash, so leave it out.`],
-        [t.P - t.A, 'both', () => `Two items are swapped. The nearby store’s ${m(t.E)} of lost profit counts, because the new store causes it. The ${m(t.A)} head-office share does not, because head office costs the same either way.`],
-        [t.P + t.E, 'added', () => `The nearby store loses that ${m(t.E)}, so it lowers Ironbark’s cash. Subtract it.`]],
-        opts: () => ({ otherMsg: `Start from ${m(t.P)} and subtract only the items that change because the store opens.` }) },
-      t3: { exact: t.O, diag: [
-        [X, 'opp', () => `If the store opens, Ironbark gives up the gym’s rent. Money given up counts like money spent: ${m(X)} − ${m(t.R)}.`],
-        [X - t.R - t.I, 'interest', () => `Leave the ${m(t.I)} of interest out. The discount rate already charges the store for the money it uses, so subtracting interest as well counts that cost twice.`],
-        [X - t.I, 'both', () => `Two items are swapped. The gym’s ${m(t.R)} rent counts, because Ironbark gives it up. The ${m(t.I)} of interest does not, because the discount rate already charges for the money.`],
-        [X + t.R, 'added', () => `Ironbark loses the gym’s ${m(t.R)} rent if the store opens, so subtract it.`],
-        [t.P - t.R, 'start', () => `Start from ${m(X)}, the yearly cash from the last step, which already takes out the nearby store’s lost profit. Then subtract the gym’s rent.`],
-        [X - t.A - t.R, 'overhead', () => `The ${m(t.A)} head-office share stays out here too. Start from ${m(X)} and subtract only the gym’s rent.`]],
-        opts: () => ({ otherMsg: `Start from ${m(X)} and subtract only the items that change because the store opens.` }) },
-      t4r1: { exact: t.tax1, diag: [
-        [t.O * (1 - t.tax), 'after', () => `That is the cash left after tax. Type the tax itself: ${m(t.O)} × ${pc(t.tax)}.`],
-        [(t.O - t.dep) * t.tax, 'net', () => `That takes depreciation off first. Here the tax saving gets its own row, so tax the full yearly cash: ${m(t.O)} × ${pc(t.tax)}.`]],
-        opts: () => ({ otherMsg: `Taxes = yearly cash before tax × tax rate = ${m(t.O)} × ${pc(t.tax)}.` }) },
-      t4r2: { exact: t.dep, diag: [
-        [BF, 'nodiv', () => `Spread the cost evenly over ${LIFE} years: ${m(BF)} ÷ ${LIFE}.`],
-        [(BF + t.S) / LIFE, 'sunk', () => 'Leave the market survey out. It was already paid and it is not equipment.'],
-        [BF / (LIFE - 1), 'years', () => `Divide by the store’s full ${LIFE}-year life: ${m(BF)} ÷ ${LIFE}.`],
-        [t.B / LIFE, 'nofix', () => `Depreciate the fixtures too: (${m(t.B)} + ${m(t.F)}) ÷ ${LIFE}.`]],
-        opts: () => ({ otherMsg: `Depreciation = build-out and fixtures ÷ years of life = ${m(BF)} ÷ ${LIFE}.` }) },
-      t4r3: { exact: t.shield, diag: [
-        [t.dep, 'dep', () => `That is the depreciation itself. The saving is depreciation each year × tax rate: ${m(t.dep)} × ${pc(t.tax)}.`],
-        [t.dep * (1 - t.tax), 'oneminus', () => `Multiply by the tax rate, ${pc(t.tax)}, not by ${pc(1 - t.tax)}.`],
-        [BF * t.tax, 'whole', () => `That is the tax rate times the whole ${m(BF)}. Use one year’s depreciation, ${m(t.dep)}.`]],
-        opts: () => ({ otherMsg: `Tax saving = depreciation each year × tax rate = ${m(t.dep)} × ${pc(t.tax)}.` }) },
-      t5r1: { exact: -t.NWC, diag: [
-        [-t.Inv, 'nopay', () => `Suppliers fund ${m(t.Pay)} of the products, so Ironbark ties up only the rest: −(${m(t.Inv)} − ${m(t.Pay)}).`],
-        [-(t.Inv + t.Pay), 'addpay', () => `Subtract the ${m(t.Pay)} suppliers fund. It lowers the cash Ironbark ties up.`],
-        [-t.Pay, 'pay', () => `${m(t.Pay)} is the part suppliers fund. Ironbark ties up the rest: −(${m(t.Inv)} − ${m(t.Pay)}).`]],
-        opts: () => ({ signMsg: 'The size is right, but cash goes out in year 0, so type it as a negative number.', otherMsg: `−(products on the shelves − what suppliers fund) = −(${m(t.Inv)} − ${m(t.Pay)}).` }) },
-      t5r2: { exact: t.NWC, diag: [
-        [t.Inv, 'nopay', () => `The same amount that went in comes back: ${m(t.Inv)} − ${m(t.Pay)}.`],
-        [0, 'zero', () => 'The cash comes back when the store closes and sells its last products. Type the amount that went in, as a positive number.']],
-        opts: () => ({ minTol: 2, signMsg: 'The size is right, but this cash comes back in, so type it as a positive number.', otherMsg: `Year 0’s working capital, now positive: ${m(t.Inv)} − ${m(t.Pay)}.` }) },
-      t6r1: { exact: t.y0, diag: [
-        [-BF, 'nowc', () => `Add the ${m(t.NWC)} of working capital going in: ${m(-BF)} − ${m(t.NWC)}.`],
-        [-BF - t.Inv, 'inv', () => `Use the working capital from the table, ${m(-t.NWC)}, which already takes off what suppliers fund.`],
-        [-BF + t.NWC, 'wcsign', () => `Working capital goes out in year 0, so subtract it: ${m(-BF)} − ${m(t.NWC)}.`],
-        [-BF - t.S - t.NWC, 'sunk', () => `Leave the ${m(t.S)} market survey out. It was already paid.`]],
-        opts: () => ({ signMsg: 'The size is right, but year 0 is cash going out, so type it as a negative number.', otherMsg: `Start-up cash + working capital = ${m(-BF)} − ${m(t.NWC)}.` }) },
-      t6r2: { exact: t.yearly, diag: [
-        [t.after, 'nomaint', () => `Subtract the maintenance capex too: ${m(t.after)} − ${m(t.M)}.`],
-        [t.O - t.tax1 - t.M, 'noshield', () => `Add the ${m(t.shield)} tax saving from depreciation.`],
-        [t.O - t.tax1, 'neither', () => `Add the ${m(t.shield)} tax saving and subtract the ${m(t.M)} of maintenance capex.`],
-        [t.yearly - t.dep, 'dep', () => `Depreciation is not cash leaving, so do not subtract the ${m(t.dep)}. It enters only through the ${m(t.shield)} tax saving.`],
-        [t.yearly + t.NWC, 'wcmid', () => `The ${m(t.NWC)} of working capital comes back only once, in year ${LIFE}. Leave it out of years 1 to ${LIFE - 1}.`]],
-        opts: () => ({ otherMsg: `Add the column: ${m(t.O)} − ${m(t.tax1)} + ${m(t.shield)} − ${m(t.M)}.` }) },
-      t6r3: { exact: t.y5, diag: [
-        [t.yearly, 'nowcback', () => `In the last year the ${m(t.NWC)} of working capital comes back. Add it.`],
-        [t.yearly - t.NWC, 'wcsign', () => `The working capital comes back in, so add the ${m(t.NWC)} rather than subtract it.`],
-        [t.after + t.NWC, 'nomaint', () => `The store still spends ${m(t.M)} on maintenance capex in year ${LIFE}. Subtract it.`]],
-        opts: () => ({ otherMsg: `Add the column: ${m(t.yearly)} + ${m(t.NWC)} of working capital coming back.` }) },
-    };
+  /* Lines for each task. mode: 'ex' (a worked example: every result shown, and each sorting line names its trap),
+     'faded' (most lines given) or 'own' (every line blank). The worked example uses the same function on other numbers,
+     so the two tables always have the same lines. Values that count against cash are typed as positive amounts. */
+  const LINES = {
+    open: (o, mode) => [
+      { key: 'build', label: 'Build-out and fixtures', calc: 'spent only if the store opens', value: o.B },
+      { key: 'train', label: 'Hiring and training staff', calc: 'spent only if the store opens', value: o.Tr },
+      { key: 'survey', label: 'Market survey', calc: mode === 'ex' ? `${m(o.S)}, already paid: a sunk cost` : `${m(o.S)}, paid last spring`, value: 0, input: true },
+      { key: 'start', label: 'Start-up cash', calc: mode === 'ex' ? `${m(o.B)} + ${m(o.Tr)} + $0` : `${m(o.B)} + ${m(o.Tr)} + the survey’s amount`, value: o.B + o.Tr, input: true }],
+    yearly: (o, mode) => [
+      { key: 'P', label: 'Sales minus the store’s own costs', calc: 'products, staff, power', value: o.P },
+      { key: 'E', label: 'Profit lost at a nearby store', calc: mode === 'ex' ? 'erosion: caused by the new store' : `${o.near} loses ${m(o.E)} a year to it`, value: o.E, input: true },
+      { key: 'A', label: 'Head-office share', calc: mode === 'ex' ? `overhead: ${m(o.A)} charged, but head office costs the same either way` : `${m(o.A)} a year; head office costs the same either way`, value: 0, input: true },
+      { key: 'R', label: 'Rent a tenant would pay', calc: mode === 'ex' ? 'opportunity cost: given up if the store opens' : `${o.tenant} would pay ${m(o.R)} a year`, value: o.R, input: true },
+      { key: 'O', label: 'Yearly cash before tax', calc: mode === 'ex' ? `${m(o.P)} − ${m(o.E)} − $0 − ${m(o.R)}` : 'sales minus own costs − the amounts that count', value: o.P - o.E - o.R, input: true }],
+    tax: (o, mode) => [
+      { key: 'T', label: 'Taxes on the yearly cash', calc: mode === 'own' ? 'yearly cash before tax × tax rate' : `${m(o.O)} × ${pc(o.t)}`, value: o.O * o.t, input: mode === 'own' },
+      { key: 'D', label: 'Depreciation each year', calc: mode === 'own' ? `build-out and fixtures ÷ ${LIFE} years` : `${m(o.BF)} ÷ ${LIFE} years`, value: o.BF / LIFE, input: mode === 'own' },
+      { key: 'Sv', label: 'Tax saving from depreciation', calc: mode === 'own' ? 'depreciation × tax rate' : `${m(o.BF / LIFE)} × ${pc(o.t)}`, value: o.BF / LIFE * o.t, input: true }],
+    cf: (o, mode) => {
+      const T = o.O * o.t, D = o.BF / LIFE, Sv = D * o.t, CF = o.O - T + Sv - o.M, f = af4(o.r), PV = CF * f, npv = -o.start + PV;
+      const nums = mode !== 'own';
+      return [
+        { key: 'O', label: 'Yearly cash before tax', calc: 'given', value: o.O },
+        { key: 'T', label: 'Taxes on the yearly cash', calc: 'cash before tax × tax rate', value: T },
+        { key: 'D', label: 'Depreciation each year', calc: `build-out ÷ ${LIFE} years`, value: D },
+        { key: 'Sv', label: 'Tax saving from depreciation', calc: 'depreciation × tax rate', value: Sv },
+        { key: 'M', label: 'Maintenance capex', calc: 'racks and repairs', value: o.M },
+        { key: 'CF', label: `Cash flow, each of years 1 to ${LIFE}`, calc: nums ? `${m(o.O)} − ${m(T)} + ${m(Sv)} − ${m(o.M)}` : 'cash before tax − taxes + tax saving − maintenance capex', value: CF, input: true },
+        { key: 'PV', label: `Value today of years 1 to ${LIFE}`, calc: nums ? `${m(CF)} × ${f4(f)}` : `cash flow each year × ${f4(f)}`, value: PV, input: mode === 'own' },
+        { key: 'Y0', label: 'Year 0 cash flow', calc: nums ? 'start-up cash, going out' : `start-up cash, ${m(o.start)}, going out`, value: -o.start, input: mode === 'own' },
+        { key: 'NPV', label: 'NPV', calc: nums ? `${m(-o.start)} + ${m(PV)}` : 'year 0 cash flow + value today', value: npv, input: true }];
+    },
+  };
+
+  // Worked examples: other stores, other numbers. Built on first use, because money() is not available when config.js loads.
+  let EX = null;
+  const EXAMPLES = () => EX || (EX = {
+    open: { cap: 'A mall kiosk: $40,000 of build-out and fixtures, $5,000 to hire and train staff, and a $3,000 market survey paid last year', lines: LINES.open({ B: 40000, Tr: 5000, S: 3000 }, 'ex') },
+    yearly: { cap: 'A smaller store leaves $90,000 a year. A sister store would lose $8,000 a year, head office would charge $20,000, and a tenant pays $15,000 a year for the space.', lines: LINES.yearly({ P: 90000, E: 8000, A: 20000, R: 15000 }, 'ex') },
+    tax1: { cap: 'A store adds $120,000 a year before tax at a 20% tax rate. Its build-out and fixtures cost $250,000.', lines: LINES.tax({ O: 120000, t: 0.20, BF: 250000 }, 'ex') },
+    tax2: { cap: 'A store adds $150,000 a year before tax at a 25% tax rate. Its build-out and fixtures cost $400,000.', lines: LINES.tax({ O: 150000, t: 0.25, BF: 400000 }, 'ex') },
+    cf1: { cap: 'A bike shop: start-up cash $300,000, of which $280,000 is build-out and fixtures. 20% tax rate, $6,000 a year of maintenance capex, 8% required return.', lines: LINES.cf({ O: 100000, t: 0.20, BF: 280000, M: 6000, r: 0.08, start: 300000 }, 'ex'),
+      after: 'The NPV is above zero, so the bike shop is worth opening.' },
+    cf2: { cap: 'A store: start-up cash $420,000, of which $400,000 is build-out and fixtures. 25% tax rate, $10,000 a year of maintenance capex, 9% required return.', lines: LINES.cf({ O: 150000, t: 0.25, BF: 400000, M: 10000, r: 0.09, start: 420000 }, 'ex'),
+      after: 'The NPV is above zero, so this store is worth opening.' },
+  });
+
+  const PLAZA = (s) => ({ B: s.B, Tr: s.Tr, S: s.S, P: s.P, E: s.E, A: s.A, R: s.R, near: 'Ironbark’s store four miles away', tenant: 'a gym',
+    O: s.O, t: s.t, BF: s.B, M: s.M, r: s.r, start: s.B + s.Tr });
+  const OUTLET = (s) => ({ O: s.O2, t: s.t, BF: s.B2, Tr: s.Tr2, M: s.M2, r: s.r, start: s.B2 + s.Tr2 });
+  function linesFor(t, mode) {
+    const o = t.id === 'tax1' || t.id === 'cf1' ? OUTLET(t) : PLAZA(t);
+    const kind = t.id === 'open' ? 'open' : t.id === 'yearly' ? 'yearly' : /^tax/.test(t.id) ? 'tax' : 'cf';
+    return LINES[kind](o, mode || (t.id === 'yearly' || t.id === 'tax2' || t.id === 'cf2' ? 'own' : 'faded'));
   }
-  // Messages are thunks, built only for the answer being judged (money formatting is slow in bulk).
-  const judgeCell = (c, raw, h) => {
-    const v = h.parseMoney(raw), lazy = (x) => (typeof x === 'function' ? x() : x);
-    const opts = Object.assign({ closeMsg: CLOSE }, c.opts ? c.opts() : {});
-    const res = h.judgeNumber(v, c.exact, c.diag.map((d) => [d[0], d[1], d[2]]), Object.assign({}, opts, { otherMsg: 'other' }));
-    if (res.code === 'other') res.msg = lazy(opts.otherMsg) || 'Not yet. Use the help button below to see the setup.';
-    else res.msg = lazy(res.msg);
-    return res; };
-  // Every value a cell compares against stays at least 0.5% apart, so no diagnosis can mask the answer or another diagnosis.
-  function separated(c) {
-    const vals = [c.exact, -c.exact].concat(c.diag.map((d) => d[0]));
-    const gap = 0.005 * Math.max(Math.abs(c.exact), 1);
-    for (let i = 0; i < vals.length; i++) for (let j = i + 1; j < vals.length; j++) if (Math.abs(vals[i] - vals[j]) < gap) return false;
+
+  // Common slips for one line, phrased with the student's own numbers: [[wrong value, code, message], ...].
+  function diagFor(t, key) {
+    const o = t.id === 'tax1' || t.id === 'cf1' ? OUTLET(t) : PLAZA(t);
+    const T = o.O * o.t, D = o.BF / LIFE, Sv = D * o.t, CF = o.O - T + Sv - o.M, f = af4(o.r), PV = CF * f;
+    const d = {
+      survey: [[t.S, 'sunk', `The survey was paid last spring. That ${m(t.S)} is gone whether or not the store opens, so type 0.`]],
+      start: [[t.B + t.Tr + t.S, 'sunk', `Leave the ${m(t.S)} survey out. It was already paid.`], [t.B, 'notrain', `Hiring and training staff happens only if the store opens, so add the ${m(t.Tr)}.`],
+        [t.B + t.S, 'swap', `Count the ${m(t.Tr)} of training, which happens only if the store opens, and leave out the ${m(t.S)} survey, which is already paid.`]],
+      E: [[0, 'noerosion', `The nearby store loses ${m(t.E)} a year only because the new store opens, so it counts. Type ${m(t.E)}.`]],
+      A: [[t.A, 'overhead', `Head office costs the same whether or not the store opens, so its ${m(t.A)} share does not change Ironbark’s cash. Type 0.`]],
+      R: [[0, 'noopp', `If the store opens, the gym cannot rent the building, so Ironbark gives up ${m(t.R)} a year. Cash given up counts like cash spent.`]],
+      O: [[t.P, 'none', `Subtract the amounts that count: ${m(t.P)} − ${m(t.E)} − ${m(t.R)}.`], [t.P - t.E - t.R - t.A, 'overhead', `Leave the ${m(t.A)} head-office share out. Head office costs the same either way.`],
+        [t.P - t.E, 'norent', `Subtract the gym’s ${m(t.R)} of rent too. Ironbark gives it up if the store opens.`], [t.P - t.R, 'noerosion', `Subtract the nearby store’s ${m(t.E)} of lost profit too.`],
+        [t.P - t.E - t.A, 'swap', `The gym’s ${m(t.R)} counts and the ${m(t.A)} head-office share does not. ${m(t.P)} − ${m(t.E)} − ${m(t.R)}.`], [t.P + t.E + t.R, 'added', 'Both items lower Ironbark’s cash, so subtract them.']],
+      T: [[o.O * (1 - o.t), 'after', `That is the cash left after tax. Type the tax itself: ${m(o.O)} × ${pc(o.t)}.`], [(o.O - D) * o.t, 'net', `That takes depreciation off first. The tax saving has its own line, so tax the whole ${m(o.O)}.`]],
+      D: [[o.BF, 'nodiv', `Spread the cost evenly over ${LIFE} years: ${m(o.BF)} ÷ ${LIFE}.`], [(o.BF + o.Tr) / LIFE, 'train', `Depreciate only the build-out and fixtures. The ${m(o.Tr)} of training is spent at once.`],
+        [(o.BF + o.Tr + t.S) / LIFE, 'all', `Depreciate only the build-out and fixtures, ${m(o.BF)}.`], [o.BF / (LIFE - 1), 'years', `Divide by the store’s full ${LIFE}-year life: ${m(o.BF)} ÷ ${LIFE}.`]],
+      Sv: [[D, 'dep', `That is the depreciation itself. The saving is depreciation × tax rate: ${m(D)} × ${pc(o.t)}.`], [D * (1 - o.t), 'oneminus', `Multiply by the tax rate, ${pc(o.t)}, not by ${pc(1 - o.t)}.`],
+        [o.BF * o.t, 'whole', `That is the tax rate times the whole ${m(o.BF)}. Use one year’s depreciation, ${m(D)}.`]],
+      CF: [[o.O - T - o.M, 'noshield', `Add the ${m(Sv)} tax saving from depreciation.`], [o.O - T + Sv, 'nomaint', `Subtract the ${m(o.M)} of maintenance capex too.`],
+        [CF - D, 'dep', `Depreciation is not cash leaving, so do not subtract the ${m(D)}. It enters only through the tax saving.`], [o.O - T - D - o.M, 'depnotsaving', `Use the ${m(Sv)} tax saving, added, in place of the ${m(D)} of depreciation.`],
+        [o.O - T - Sv - o.M, 'shieldsign', `The tax saving lowers the tax bill, so add the ${m(Sv)}.`], [o.O - T + D - o.M, 'depadded', `Add the tax saving, ${m(Sv)}, not the depreciation itself.`], [o.O - o.M + Sv, 'notax', `Subtract the ${m(T)} of taxes too.`]],
+      PV: [[CF * LIFE, 'nodisc', `That adds ${LIFE} years without discounting. Multiply the cash flow by the annuity factor, ${f4(f)}.`], [CF / f, 'div', `Multiply by the annuity factor, ${f4(f)}; don’t divide.`]],
+      Y0: [[-(o.start + t.S), 'sunk', `Leave the ${m(t.S)} survey out of year 0. It was already paid.`], [-o.BF, 'notrain', `Year 0 includes the ${m(o.Tr)} of training as well: −${m(o.start)}.`]],
+      NPV: [[PV + o.start, 'y0sign', `Year 0 is cash going out: ${m(-o.start)} + ${m(PV)}.`], [CF * LIFE - o.start, 'nodisc', `Discount the yearly cash flows first: ${m(CF)} × ${f4(f)}, then add year 0.`], [PV, 'noy0', `Add the year 0 cash flow, ${m(-o.start)}.`]],
+    };
+    return d[key] || [];
+  }
+  const judgeOpts = (key, v) => (key === 'PV' || key === 'NPV' ? { tol: Math.max(10, 0.0005 * Math.abs(v.scale)), scale: Math.abs(v.scale), closeMsg: 'Close. Use the annuity factor to four places and round only at the end.' }
+    : { closeMsg: 'Close, but not exact. Redo the arithmetic in Desmos.' });
+  // Lines where a student may type a cost as a negative number: judge the size only.
+  const ABS = new Set(['survey', 'E', 'A', 'R', 'T', 'D', 'Sv', 'M']), SORT = new Set(['survey', 'E', 'A', 'R']);
+
+  function judgeLines(t, rows, h) {
+    const lines = linesFor(t), ex = linesFor(t, 'ex'), rr = [], CFline = lines.find((l) => l.key === 'PV');
+    lines.forEach((l, i) => {
+      if (!l.input) return;
+      let v = h.parseMoney(rows[i]); if (ABS.has(l.key) && isFinite(v)) v = Math.abs(v);
+      const opts = Object.assign({}, judgeOpts(l.key, { scale: CFline ? CFline.value : l.value }));
+      if (l.key === 'Y0') opts.signMsg = 'The size is right, but year 0 is cash going out, so type it as a negative number.';
+      if (l.key === 'NPV') opts.signMsg = 'The size is right but the sign is flipped. Add the negative year 0 cash flow to the value today.';
+      if (l.value === 0) opts.tol = 1;
+      rr[i] = h.judgeNumber(v, l.value, diagFor(t, l.key), opts);
+      if (rr[i].code === 'other') rr[i].msg = SORT.has(l.key) ? 'Type the amount that changes Ironbark’s cash because the store opens, or 0 if nothing changes.' : `${ex[i].calc}.`;
+    });
+    return rr;
+  }
+
+  function separated(t, h) {
+    // Every value a line is compared with stays clear of the others, so no diagnosis can mask the answer or another diagnosis.
+    for (const l of linesFor(t)) {
+      if (!l.input) continue;
+      const CFline = linesFor(t).find((x) => x.key === 'PV');
+      const tol = judgeOpts(l.key, { scale: CFline ? CFline.value : l.value }).tol || Math.max(2, 0.001 * Math.abs(l.value));
+      const vals = [l.value, -l.value].concat(diagFor(t, l.key).map((d) => d[0]));
+      for (let i = 0; i < vals.length; i++) for (let j = i + 1; j < vals.length; j++) {
+        if (i === 0 && j === 1 && l.value === 0) continue;
+        if (Math.abs(vals[i] - vals[j]) < 2.5 * tol) return false;
+      }
+      if (l.value !== 0 && READING.some((x) => Math.abs(x - l.value) < 1)) return false;
+      if (l.value !== 0 && EXAMPLES()[t.id].lines.some((x) => Math.abs(x.value - l.value) < 1)) return false;
+    }
     return true;
   }
 
   function buildTasks(rng, h) {
     let s = null;
-    for (let tries = 0; tries < 200; tries++) {
-      const r = h.pick(rng, [0.08, 0.09, 0.10]), tax = h.pick(rng, [0.20, 0.25]);
-      const B = h.between(rng, 600000, 900000, 50000), F = h.between(rng, 100000, 250000, 50000), S = h.between(rng, 20000, 40000, 5000);
-      const P = h.between(rng, 400000, 550000, 50000), E = h.between(rng, 30000, 70000, 10000), A = h.between(rng, 40000, 90000, 10000);
-      const R = h.between(rng, 40000, 80000, 10000), Lo = h.between(rng, 400000, 800000, 100000), I = Lo * LOAN_RATE;
-      const Inv = h.between(rng, 400000, 600000, 50000), Pay = h.between(rng, 100000, 200000, 50000), M = h.between(rng, 10000, 30000, 5000);
-      const O = P - E - R, dep = (B + F) / LIFE, tax1 = O * tax, shield = dep * tax, after = O - tax1 + shield, yearly = after - M;
-      const NWC = Inv - Pay, y0 = -(B + F) - NWC, y5 = yearly + NWC;
-      const npv = y0 + yearly * h.annuityFactor(r, LIFE - 1) + y5 * h.df(r, LIFE);
-      const cand = { r, tax, B, F, S, P, E, A, R, Lo, I, Inv, Pay, M, O, dep, tax1, shield, after, yearly, NWC, y0, y5, npv };
-      const cs = cells(cand);
-      if (!Object.keys(cs).every((k) => separated(cs[k]))) continue;
-      s = cand;
-      if (Math.abs(npv) > 40000) break;
+    for (let tries = 0; tries < 400; tries++) {
+      const r = h.pick(rng, [0.08, 0.09, 0.10]), t = h.pick(rng, [0.20, 0.25]);
+      const B = h.between(rng, 600000, 900000, 50000), Tr = h.between(rng, 20000, 60000, 10000), S = h.between(rng, 15000, 40000, 5000);
+      const P = h.between(rng, 300000, 450000, 25000), E = h.between(rng, 30000, 70000, 10000), A = h.between(rng, 40000, 90000, 10000), R = h.between(rng, 40000, 80000, 10000);
+      const M = h.between(rng, 10000, 30000, 5000);
+      const O2 = h.between(rng, 90000, 160000, 10000), B2 = h.between(rng, 300000, 450000, 50000), Tr2 = h.between(rng, 10000, 30000, 10000), M2 = h.between(rng, 5000, 15000, 5000);
+      if (E === R || E === A || R === A) continue;
+      const O = P - E - R, cand = { r, t, B, Tr, S, P, E, A, R, M, O, O2, B2, Tr2, M2 };
+      const T = O * t, Sv = B / LIFE * t, CF = O - T + Sv - M;
+      cand.npv = -(B + Tr) + CF * af4(r);
+      const CF2 = O2 - O2 * t + B2 / LIFE * t - M2;
+      if (Math.abs(cand.npv) < 25000 || Math.abs(-(B2 + Tr2) + CF2 * af4(r)) < 10000) continue;
+      const ids = ['open', 'yearly', 'tax1', 'tax2', 'cf1', 'cf2'];
+      if (!ids.every((id) => separated(Object.assign({ id }, cand), h))) continue;
+      s = cand; break;
     }
-    const T = [];
-    T.push(Object.assign({ id: 't1', answer: s.B + s.F }, s));
-    T.push(Object.assign({ id: 't2', answer: s.P - s.E }, s));
-    T.push(Object.assign({ id: 't3', answer: s.O }, s));
-    T.push(Object.assign({ id: 't4' }, s));
-    T.push(Object.assign({ id: 't5' }, s));
-    T.push(Object.assign({ id: 't6', decision: s.npv > 0 ? 'build' : 'pass' }, s));
-    return T;
+    return ['open', 'yearly', 'tax1', 'tax2', 'cf1', 'cf2'].map((id) => {
+      const x = Object.assign({ id }, s);
+      if (id === 'cf2') x.decision = s.npv > 0 ? 'open' : 'pass';
+      return x;
+    });
   }
 
-  const esc = (s) => String(s == null ? '' : s).replace(/"/g, '');
-  const cell = (L, y, label, narrow) => { const rows = L.rows || []; return `<label class="sr-only" for="r${y}">${label}</label><input id="r${y}" class="rowin" data-row="${y}"${narrow ? ' style="width:min(7.2rem,19vw)"' : ''} inputmode="decimal" autocomplete="off" value="${rows[y] ? esc(rows[y]) : ''}"><span class="mark" id="mk${y}"></span>`; };
-  const list = (items) => `<div class="tw"><table class="cf"><caption>What Wendell was handed</caption><thead><tr><th scope="col" style="text-align:left">Item</th><th scope="col">Amount</th></tr></thead><tbody>${items.map((x) => `<tr><td class="lbl">${x[0]}</td><td>${x[1]}</td></tr>`).join('')}</tbody></table></div>`;
+  const PROBLEM = {
+    open: (t) => ({ title: 'What does it cost to open?', place: 'Ironbark owns an empty building in a shopping plaza and wants to open its next store there.',
+      body: '<p>Wendell needs the store’s start-up cash for year 0. In the Result column, type the amount that counts, or 0 for an item that stays out. Two lines are done for you.</p>' }),
+    yearly: (t) => ({ title: 'What does the store add each year?', place: 'Every new store changes the stores and buildings around it.',
+      body: '<p>Wendell has three more items. Type the amount each one takes from the store’s yearly cash, or 0 if it stays out. Then find the yearly cash before tax.</p>' }),
+    tax1: (t) => ({ title: 'Taxes on the outlet store', place: 'Ironbark is also weighing a smaller outlet store by the highway.',
+      body: `<p>The outlet would add <b>${m(t.O2)}</b> a year before tax. Ironbark pays <b>${pc(t.t)}</b> tax, and the outlet’s build-out and fixtures, <b>${m(t.B2)}</b>, are depreciated over ${LIFE} years. What is the tax saving? Two lines are done for you.</p>` }),
+    tax2: (t) => ({ title: 'Taxes on the plaza store', place: 'Back to the plaza store.',
+      body: `<p>The plaza store adds <b>${m(t.O)}</b> a year before tax. Its build-out and fixtures, <b>${m(t.B)}</b>, are depreciated over ${LIFE} years, and the tax rate is <b>${pc(t.t)}</b>. Fill in all three lines.</p>` }),
+    cf1: (t) => ({ title: 'The outlet’s NPV', place: 'Wendell wants one number for the outlet: its NPV.',
+      body: `<p>The outlet’s start-up cash is <b>${m(t.B2 + t.Tr2)}</b> and its maintenance capex <b>${m(t.M2)}</b> a year. At Ironbark’s required <b>${pc(t.r)}</b>, the annuity factor for ${LIFE} years is <b>${f4(af4(t.r))}</b>. Find the cash flow each year and the NPV.</p>` }),
+    cf2: (t) => ({ title: 'Open or pass?', place: 'Now the plaza store, with your numbers from steps 1, 2 and 5.',
+      body: `<p>The store would spend <b>${m(t.M)}</b> a year on maintenance capex. At Ironbark’s required <b>${pc(t.r)}</b>, the annuity factor for ${LIFE} years is <b>${f4(af4(t.r))}</b>. Find the NPV, then decide.</p>`,
+      choice: { legend: 'Should Ironbark open the plaza store?', options: [['open', 'Open it: the NPV is above zero'], ['pass', 'Pass: the NPV is below zero']] } }),
+  };
 
   function taskView(t, L, h) {
-    if (t.id === 't1') return { title: 'What does it cost to open?', place: 'Ironbark owns an empty building in a shopping plaza and wants to turn it into its next store.',
-      body: `<p>Wendell has a list of what the store has cost or will cost before the doors open. Ask the one question about each item.</p>${list([
-        ['Building out the store: walls, floors, lighting, fitting rooms', m(t.B)], ['Fixtures and checkout counters', m(t.F)], ['Survey of the local market, paid last spring', m(t.S)]])}
-        <p>Working capital comes in a later step, so leave it out here.</p>`,
-      example: `<p>A kiosk needs a $40,000 build-out and a $10,000 counter. A $3,000 study of the site was paid for last year.</p>
-        <p>The study is already spent whatever happens, so it stays out.</p>
-        <p>Start-up cash = $40,000 + $10,000 = $50,000.</p>`,
-      value: { label: 'How much start-up cash belongs in the store’s year 0?', help: '' } };
-    if (t.id === 't2') return { title: 'The store four miles away', place: 'Every new store changes the stores around it.',
-      body: `<p>Once it is open, the store’s sales minus its own costs (products, staff, utilities) should leave <b>${m(t.P)}</b> a year before tax. Two more items are on Wendell’s list.</p>${list([
-        ['Profit an existing Ironbark store four miles away expects to lose each year, as some of its customers switch to the new store', m(t.E)],
-        ['Head-office costs (salaries, the website, the headquarters) that the accountants will charge the new store each year as its share. Head office costs the same whether or not the store opens.', m(t.A)]])}`,
-      example: `<p>A smaller store would leave $90,000 a year before tax.</p>
-        <p>A sister store nearby would lose $10,000 a year of profit to it, so that counts.</p>
-        <p>Head office would charge it $15,000 a year, but head office costs the same either way, so that stays out.</p>
-        <p>Yearly cash before tax = $90,000 − $10,000 = $80,000.</p>`,
-      value: { label: 'How much yearly cash before tax should the store’s cash flows show so far?', help: '' } };
-    if (t.id === 't3') return { title: 'The building and the loan', place: 'The building is empty today, but it does not have to stay that way.',
-      body: `<p>From the last step, the store adds <b>${m(t.P - t.E)}</b> a year before tax. Two more items are on the list.</p>${list([
-        ['Rent a gym has offered to pay each year for the empty building. If Ironbark opens its store there, the gym cannot rent it.', m(t.R)],
-        [`Interest on a bank loan of ${m(t.Lo)} at ${pc(LOAN_RATE)} that would pay for part of the build-out`, m(t.I)]])}`,
-      example: `<p>A smaller store adds $80,000 a year before tax.</p>
-        <p>It would use a warehouse a tenant now rents for $12,000 a year. Ironbark gives up that rent, so it counts.</p>
-        <p>The interest on its loan stays out, because the discount rate already charges for the money.</p>
-        <p>Yearly cash before tax = $80,000 − $12,000 = $68,000.</p>`,
-      value: { label: 'What yearly cash before tax belongs in the store’s cash flows now?', help: '' } };
-    if (t.id === 't4') return { title: 'The tax saving from depreciation', place: 'The store’s cash is taxed, but its equipment lowers the tax bill.',
-      body: `<p>Ironbark pays <b>${pc(t.tax)}</b> of its profit in taxes. The build-out and fixtures cost <b>${m(t.B + t.F)}</b>, and Ironbark depreciates them evenly over the store’s <b>${LIFE}-year</b> life. Depreciation is not cash leaving, but it lowers taxable profit, so it lowers the tax bill.</p>`,
-      example: `<p>Yearly cash before tax $100,000, tax rate 20%, equipment $300,000 depreciated over 10 years.</p>
-        <p>Taxes on the yearly cash = $100,000 × 20% = $20,000.</p>
-        <p>Depreciation each year = $300,000 ÷ 10 = $30,000.</p>
-        <p>Tax saving from depreciation = $30,000 × 20% = $6,000.</p>`,
-      parts: [{ html: '<p>Now the store. Fill in the three rows.</p>', field: 'table' }],
-      table: `<div class="tw"><table class="cf"><caption>One year’s taxes</caption><thead><tr><th scope="col" style="text-align:left">Row</th><th scope="col" style="text-align:left">How to work it out</th><th scope="col">Amount</th></tr></thead><tbody>
-        <tr><td class="lbl">Taxes on the yearly cash</td><td class="lbl">yearly cash before tax × tax rate = ${m(t.O)} × ${pc(t.tax)}</td><td>${cell(L, 1, 'Taxes on the yearly cash')}</td></tr>
-        <tr><td class="lbl">Depreciation each year</td><td class="lbl">build-out and fixtures ÷ years of life = ${m(t.B + t.F)} ÷ ${LIFE}</td><td>${cell(L, 2, 'Depreciation each year')}</td></tr>
-        <tr><td class="lbl">Tax saving from depreciation</td><td class="lbl">depreciation each year × tax rate</td><td>${cell(L, 3, 'Tax saving from depreciation')}</td></tr></tbody>
-        <tfoot><tr class="total hl"><td class="lbl" colspan="2"><b>Cash after taxes</b> = yearly cash before tax − taxes on the yearly cash + tax saving from depreciation</td><td id="rowTotal"><b>$0</b></td></tr></tfoot></table></div>`,
-      onRows: (rs, $) => { const a = h.parseMoney(rs[1]), c = h.parseMoney(rs[3]); $('#rowTotal').innerHTML = '<b>' + m(t.O - (isFinite(a) ? a : 0) + (isFinite(c) ? c : 0)) + '</b>'; },
-      helpLabels: ['Show me the first row', 'Show me every row'] };
-    if (t.id === 't5') return { title: 'Stocking the shelves', place: 'A sporting-goods store needs bikes, balls and shoes on the shelves the day it opens.',
-      body: `<p>The new store will stock <b>${m(t.Inv)}</b> of products. Suppliers let Ironbark pay for <b>${m(t.Pay)}</b> of that after it arrives, so suppliers fund that part. The cash Ironbark itself ties up is the <b>working capital</b>. It goes out when the store opens and comes back when the store closes in year ${LIFE}.</p>`,
-      example: `<p>A shop stocks $80,000 of products, and suppliers fund $30,000 of them.</p>
-        <p>Year 0, going out: −($80,000 − $30,000) = −$50,000.</p>
-        <p>Last year, coming back: +$50,000.</p>`,
-      parts: [{ html: '<p>Now the store. Start cash going out with a minus sign.</p>', field: 'table' }],
-      table: `<div class="tw"><table class="cf"><caption>Working capital going in and coming back</caption><thead><tr><th scope="col" style="text-align:left">Row</th><th scope="col" style="text-align:left">How to work it out</th><th scope="col">Amount</th></tr></thead><tbody>
-        <tr><td class="lbl">Year 0: working capital going in</td><td class="lbl">−(products on the shelves − what suppliers fund) = −(${m(t.Inv)} − ${m(t.Pay)})</td><td>${cell(L, 1, 'Year 0 working capital')}</td></tr>
-        <tr><td class="lbl">Year ${LIFE}: working capital coming back</td><td class="lbl">year 0’s working capital, now coming in as a positive amount</td><td>${cell(L, 2, 'Final-year working capital')}</td></tr></tbody></table></div>`,
-      helpLabels: ['Show me year 0', 'Show me both rows'] };
-    if (t.id === 't6') {
-      const r = t.r;
-      const row = (lab, a, b, c) => `<tr><td class="lbl" lang="en" style="font-size:min(16px,3.7vw);hyphens:auto">${lab}</td><td>${a}</td><td>${b}</td><td>${c}</td></tr>`;
-      return { title: 'Put the rows together', place: 'Wendell needs one line he can discount: the store’s cash flow in each year.',
-        body: `<p>There is one last row. Every year the store spends <b>${m(t.M)}</b> on <b>maintenance capital spending</b> (maintenance capex), such as replacing worn display racks and repairing the lighting, just to keep running as it is. Everything else comes from your last five steps.</p>`,
-        example: `<p>Year 0: −$100,000 start-up cash − $20,000 working capital = −$120,000.</p>
-          <p>Each middle year: $50,000 − $10,000 taxes + $4,000 tax saving − $3,000 maintenance capex = $41,000.</p>
-          <p>Last year: $41,000 + $20,000 working capital coming back = $61,000.</p>
-          <p>The NPV of that row decides: above zero means open, below zero means pass.</p>`,
-        // The table stays out of parts: inside the engine's grid form a wide table stretches the page at phone width.
-        parts: [{ field: 'choice' }],
-        table: `<p>Now the store. Add each column down to get its cash flow.</p><div class="tw"><table class="cf"><caption>The store’s cash flows</caption><thead><tr><th scope="col" style="text-align:left">Row</th><th scope="col">Year 0</th><th scope="col">Years 1 to ${LIFE - 1}, each</th><th scope="col">Year ${LIFE}</th></tr></thead><tbody>
-          ${row('Start-up cash: build-out and fixtures', m(-(t.B + t.F)), '', '')}
-          ${row('Working capital', m(-t.NWC), '', sgn(t.NWC))}
-          ${row('Yearly cash before tax', '', m(t.O), m(t.O))}
-          ${row('Taxes on the yearly cash', '', m(-t.tax1), m(-t.tax1))}
-          ${row('Tax saving from depreciation', '', sgn(t.shield), sgn(t.shield))}
-          ${row('Maintenance capex', '', m(-t.M), m(-t.M))}
-          </tbody><tfoot><tr class="total hl"><td class="lbl"><b>Cash flow</b></td><td>${cell(L, 1, 'Year 0 cash flow', 1)}</td><td>${cell(L, 2, 'Cash flow in each of years 1 to ' + (LIFE - 1), 1)}</td><td>${cell(L, 3, 'Year ' + LIFE + ' cash flow', 1)}</td></tr>
-          <tr><td class="lbl" colspan="2"><b>NPV at ${pc(r)}</b> of the cash flow row</td><td id="rowTotal" colspan="2" style="text-align:right"><b>$0</b></td></tr></tfoot></table></div>`,
-        onRows: (rs, $) => { const v = [1, 2, 3].map((y) => h.parseMoney(rs[y])); if (v.some((x) => !isFinite(x))) { $('#rowTotal').innerHTML = '<b>Fill in all three</b>'; return; }
-          $('#rowTotal').innerHTML = '<b>' + m(v[0] + v[1] * h.annuityFactor(r, LIFE - 1) + v[2] * h.df(r, LIFE)) + '</b>'; },
-        choice: { legend: 'Should Ironbark open the store?', options: [['build', 'Open it'], ['pass', 'Pass']] },
-        helpLabels: ['Show me year 0', 'Show me every column'] };
-    }
+    const P = PROBLEM[t.id](t), E = EXAMPLES()[t.id];
+    const example = h.ladder(E.lines, { filled: true, caption: E.cap }) + (E.after ? `<p>${E.after}</p>` : '');
+    const table = h.ladder(linesFor(t), { rows: L.rows, caption: 'Your turn' });
+    const parts = [{ html: '', field: 'table' }];
+    if (P.choice) parts.push({ html: '', field: 'choice' });
+    return { title: P.title, place: P.place, body: P.body, example, table, parts, choice: P.choice,
+      helpLabels: ['Show me the first blank', 'Show me every line'] };
   }
 
-  function judgeRows(t, e, h, keys, names) {
-    const cs = cells(t), rows = e.rows || [], rr = [];
-    keys.forEach((k, i) => { rr[i + 1] = judgeCell(cs[k], rows[i + 1], h); });
-    const bad = keys.findIndex((_, i) => !rr[i + 1].ok);
-    if (bad >= 0) return { ok: false, rowRes: rr, msg: `${names[bad]}: ${rr[bad + 1].msg}` };
-    return { ok: true, rowRes: rr };
-  }
   function judgeTask(t, e, h) {
-    const cs = cells(t);
-    if (t.id === 't1') { const v = h.parseMoney(e.value); return judgeCell(cs.t1, isFinite(v) ? Math.abs(v) : e.value, h); }
-    if (t.id === 't2' || t.id === 't3') return judgeCell(cs[t.id], e.value, h);
-    if (t.id === 't4') return judgeRows(t, e, h, ['t4r1', 't4r2', 't4r3'], ['Taxes on the yearly cash', 'Depreciation each year', 'Tax saving']);
-    if (t.id === 't5') return judgeRows(t, e, h, ['t5r1', 't5r2'], ['Year 0', 'Year ' + LIFE]);
-    if (t.id === 't6') {
-      const res = judgeRows(t, e, h, ['t6r1', 't6r2', 't6r3'], ['Year 0', `Years 1 to ${LIFE - 1}`, `Year ${LIFE}`]);
-      if (!res.ok) return res;
-      if (e.choice !== t.decision) return { ok: false, rowRes: res.rowRes, msg: !e.choice ? 'Decide whether Ironbark should open the store as well.' : `Your cash flow row gives an NPV of ${m(t.npv)}. Open the store when the NPV is above zero, and pass when it is below.` };
-      return res;
+    const lines = linesFor(t), rr = judgeLines(t, e.rows || [], h);
+    const bad = rr.findIndex((x) => x && !x.ok);
+    if (bad >= 0) return { ok: false, rowRes: rr, msg: `${lines[bad].label}: ${rr[bad].msg}` };
+    if (t.decision && e.choice !== t.decision) {
+      if (!e.choice) return { ok: false, rowRes: rr, msg: 'Now answer the question under the table.' };
+      return { ok: false, rowRes: rr, msg: `The NPV is ${m(t.npv)}. Open the store when the NPV is above zero, and pass when it is below.` };
     }
+    return { ok: true, rowRes: rr };
   }
 
   function helpText(t, lvl) {
-    if (t.id === 't1') return lvl === 1 ? `Ask of each item: is it spent only if the store opens? The build-out and the fixtures are. The survey was paid last spring.` : `${m(t.B)} + ${m(t.F)} = ${m(t.B + t.F)}. The ${m(t.S)} survey stays out because it is already spent.`;
-    if (t.id === 't2') return lvl === 1 ? `The nearby store loses ${m(t.E)} only because the new store opens. Head office costs the same either way.` : `${m(t.P)} − ${m(t.E)} = ${m(t.P - t.E)}. The ${m(t.A)} head-office share stays out.`;
-    if (t.id === 't3') return lvl === 1 ? `Opening the store means saying no to the gym’s ${m(t.R)} a year. The interest is how the store is paid for, not what it earns.` : `${m(t.P - t.E)} − ${m(t.R)} = ${m(t.O)}. The ${m(t.I)} of interest stays out.`;
-    if (t.id === 't4') return lvl === 1 ? `Taxes on the yearly cash = ${m(t.O)} × ${pc(t.tax)} = ${m(t.tax1)}.` : `Taxes on the yearly cash = ${m(t.O)} × ${pc(t.tax)} = ${m(t.tax1)}.<br>Depreciation each year = ${m(t.B + t.F)} ÷ ${LIFE} = ${m(t.dep)}.<br>Tax saving = ${m(t.dep)} × ${pc(t.tax)} = ${m(t.shield)}.`;
-    if (t.id === 't5') return lvl === 1 ? `Year 0: −(${m(t.Inv)} − ${m(t.Pay)}) = ${m(-t.NWC)}.` : `Year 0: ${m(-t.NWC)}.<br>Year ${LIFE}: ${sgn(t.NWC)}, the same cash coming back.`;
-    if (t.id === 't6') { if (lvl === 1) return `Year 0: ${m(-(t.B + t.F))} − ${m(t.NWC)} = ${m(t.y0)}.`;
-      return `Year 0: ${m(-(t.B + t.F))} − ${m(t.NWC)} = ${m(t.y0)}.<br>Years 1 to ${LIFE - 1}: ${m(t.O)} − ${m(t.tax1)} + ${m(t.shield)} − ${m(t.M)} = ${m(t.yearly)}.<br>Year ${LIFE}: ${m(t.yearly)} + ${m(t.NWC)} = ${m(t.y5)}.<br>The NPV at ${pc(t.r)} is ${m(t.npv)}, so ${t.decision === 'build' ? 'open the store' : 'pass'}.`; }
+    const lines = linesFor(t, 'ex').map((l, i) => Object.assign({}, l, { input: linesFor(t)[i].input }));
+    const say = (l) => `${l.label}: ${l.calc} = ${m(l.value)}`;
+    const blanks = lines.filter((l) => l.input);
+    return lvl === 1 ? say(blanks[0]) : blanks.map(say).join('<br>');
   }
   function praise(t) {
-    if (t.id === 't1') return `Year 0 starts at ${m(t.B + t.F)}. The ${m(t.S)} survey is a <b>sunk cost</b>: already spent, so it cannot change the decision.`;
-    if (t.id === 't2') return `The nearby store’s lost profit is <b>erosion</b>, and it counts. The head-office share is <b>allocated overhead</b>, and it stays out.`;
-    if (t.id === 't3') return `The gym’s rent is an <b>opportunity cost</b>: money Ironbark gives up, so it counts. The interest is a <b>financing cost</b>, and it stays out. The store adds ${m(t.O)} a year before tax.`;
-    if (t.id === 't4') return `Depreciation cuts the tax bill by ${m(t.shield)} a year, so the government effectively pays ${m(t.shield * LIFE)} of the ${m(t.B + t.F)} build-out over ${LIFE} years.`;
-    if (t.id === 't5') return `${m(t.NWC)} leaves in year 0 and returns in year ${LIFE}. It costs Ironbark only the waiting.`;
-    if (t.id === 't6') return `The store’s NPV is ${m(t.npv)}, so ${t.decision === 'build' ? 'it adds value: open it' : 'it would lose value: pass'}.`;
+    const p = PLAZA(t), o = OUTLET(t);
+    if (t.id === 'open') return `Year 0 starts at ${m(t.B + t.Tr)}. The ${m(t.S)} survey is a <b>sunk cost</b>: already spent, so it cannot change the decision.`;
+    if (t.id === 'yearly') return `The nearby store’s lost profit is <b>erosion</b> and the gym’s rent is an <b>opportunity cost</b>: both count. The head-office share is <b>allocated overhead</b> and stays out. The store adds ${m(t.O)} a year before tax.`;
+    if (t.id === 'tax1') return `Depreciation cuts the outlet’s tax bill by ${m(o.BF / LIFE * o.t)} a year, though no cash leaves when it is recorded.`;
+    if (t.id === 'tax2') return `Over ${LIFE} years the tax saving adds up to ${m(p.BF * p.t)}, so the government effectively pays ${pc(p.t)} of the ${m(p.BF)} build-out and fixtures.`;
+    if (t.id === 'cf1') { const n = linesFor(t).find((l) => l.key === 'NPV').value; return `The outlet’s NPV is ${m(n)}, so on these numbers it ${n > 0 ? 'is worth opening' : 'is not worth opening'}.`; }
+    if (t.id === 'cf2') return `The plaza store’s NPV is ${m(t.npv)}, so ${t.decision === 'open' ? 'it adds value: open it' : 'it would lose value: pass'}.`;
   }
   function selfAnswer(t) {
-    if (t.id === 't4') return { rows: [null, String(Math.round(t.tax1)), String(Math.round(t.dep)), String(Math.round(t.shield))] };
-    if (t.id === 't5') return { rows: [null, String(-t.NWC), String(t.NWC)] };
-    if (t.id === 't6') return { rows: [null, String(Math.round(t.y0)), String(Math.round(t.yearly)), String(Math.round(t.y5))], choice: t.decision };
-    return { value: String(Math.round(t.answer)) };
+    const rows = []; linesFor(t).forEach((l, i) => { if (l.input) rows[i] = String(Math.round(l.value)); });
+    return { rows, choice: t.decision || null };
   }
   function selfWrong(t) {
-    if (t.id === 't1') return { value: String(t.B + t.F + t.S) };
-    if (t.id === 't2') return { value: String(t.P - t.E - t.A) };
-    if (t.id === 't3') return { value: String(t.O - t.I) };
-    if (t.id === 't4') return { rows: [null, String(Math.round((t.O - t.dep) * t.tax)), String(Math.round(t.dep)), String(Math.round(t.dep * (1 - t.tax)))] };
-    if (t.id === 't5') return { rows: [null, String(-t.Inv), String(t.Inv)] };
-    return { rows: [null, String(Math.round(t.y0)), String(Math.round(t.after)), String(Math.round(t.after + t.NWC))], choice: t.decision };
+    const rows = []; linesFor(t).forEach((l, i) => { if (l.input) rows[i] = String(Math.round(l.value * 1.3)); });
+    return { rows, choice: t.decision || null };
   }
 
-  const WALK = {
-    title: 'How Wendell builds one small shop',
-    intro: '<p>Here is a small Ironbark shop at a ski area, worked from start to finish. It is open for <b>5 years</b>. Fixtures cost <b>$60,000</b>, and a market survey last year cost <b>$5,000</b>. Sales minus the shop’s own costs leave <b>$30,000</b> a year before tax. The tax rate is <b>25%</b>.</p>',
-    render(stage) {
-      const R = [
-        ['Start-up cash: fixtures', '−$60,000', '', '', 0], ['Market survey, already paid: left out', '', '', '', 0],
-        ['Working capital: products minus what suppliers fund', '−$10,000', '', '+$10,000', 4],
-        ['Yearly cash before tax', '', '$30,000', '$30,000', 1], ['Taxes on the yearly cash: $30,000 × 25%', '', '−$7,500', '−$7,500', 1],
-        ['Tax saving from depreciation: ($60,000 ÷ 5) × 25%', '', '+$3,000', '+$3,000', 2],
-        ['Maintenance capex', '', '−$2,000', '−$2,000', 3],
-        ['Cash flow', '−$70,000', '$23,500', '$33,500', 5]];
-      return `<div class="tw"><table class="cf"><caption>The ski-area shop’s cash flows</caption><thead><tr><th scope="col" style="text-align:left;min-width:min(13rem,30vw)">Row</th><th scope="col">Year 0</th><th scope="col">Years 1 to 4 (each)</th><th scope="col">Year 5</th></tr></thead><tbody>${R.filter((r) => r[4] <= stage).map((r) => `<tr class="${r[4] === stage ? 'reveal' : ''}${r[4] === 5 ? ' hl' : ''}"><td class="lbl">${r[4] === 5 ? '<b>' + r[0] + '</b>' : r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</tbody></table></div>`;
-    },
-    stages: [
-      { t: 'Ask the one question', p: 'Does Ironbark’s cash change because the shop opens? The $60,000 of fixtures is spent only if it opens, so it goes in year 0. The $5,000 survey was paid last year whatever happens, so it stays out. That is a <b>sunk cost</b>.' },
-      { t: 'Taxes on the yearly cash', p: 'Taxes on the yearly cash = $30,000 × 25% = $7,500 a year.' },
-      { t: 'The tax saving from depreciation', p: 'Depreciation each year = $60,000 ÷ 5 = $12,000. It is not cash leaving, but it lowers taxable profit. Tax saving = $12,000 × 25% = $3,000 a year. Over 5 years the government effectively pays $15,000 of the $60,000 fixtures.' },
-      { t: 'Maintenance capex', p: 'Keeping the shop running means about $2,000 a year of <b>maintenance capex</b>: new racks, repairs, a replacement register. It is spent every year.' },
-      { t: 'Working capital in and out', p: 'The shop stocks $15,000 of skis and jackets, and suppliers let Ironbark pay for $5,000 of that later. Working capital = $15,000 − $5,000 = $10,000. It goes out in year 0 and comes back in year 5, when the shop sells its last products.' },
-      { t: 'Add each column', p: 'Year 0: −$60,000 − $10,000 = −$70,000. Each of years 1 to 4: $30,000 − $7,500 + $3,000 − $2,000 = $23,500. Year 5 adds the $10,000 coming back: $33,500. That row is what Wendell discounts to find the NPV, as in Unit 5.' },
-    ],
-  };
-
   root.DESK = {
-    app: 'finan4-u6-cash-flow-desk', version: 2, seedVersion: 2, salt: 'rize-finan4-u6-cashflow:7b19e4', points: 20,
-    storageKey: 'rize-finan4-u6-cashflow-v2', filePrefix: 'RelevantOrNot',
+    app: 'finan4-u6-cash-flow-desk', version: 3, seedVersion: 3, salt: 'rize-finan4-u6-cashflow:7b19e4', points: 20,
+    storageKey: 'rize-finan4-u6-cashflow-v3', filePrefix: 'RelevantOrNot',
     verifyUrl: 'https://rizecomputerscience.github.io/finan4-cash-flow-desk/verify.html',
-    calcPlaceholder: '300000*0.2/10',
-    calcHint: 'Type or tap. Use * to multiply and / to divide, so 300000*0.2/10 is the yearly tax saving from depreciating $300,000 over 10 years at a 20% tax rate.',
+    calcPlaceholder: '600000*0.25/5',
     story: { title: 'Relevant or Not?', kicker: 'Corporate Finance, Unit 6', company: 'Ironbark Sporting Goods', team: 'Finance',
       from: 'Wendell Achebe', fromTitle: 'finance director, Ironbark Sporting Goods',
-      dek: 'You have joined the finance team at Ironbark Sporting Goods, a chain of sporting-goods stores. Wendell Achebe, the finance director, is deciding whether to open a new store. Everyone has an item they want counted. Your job is to decide which items belong in the store’s cash flows, then build the rows he will discount.',
-      whatBox: '<b>One question decides every item:</b> if Ironbark opens this store, does the company’s cash change because of it? If yes, it goes in the store’s cash flows. If no, it stays out, however official it looks.',
-      stepsLine: 'There are twelve steps: a worked example, six problems with three one-question checks between them, one exam-style question, and a short note to Wendell.' },
-    steps: STEPS, quiz: QUIZ, walk: WALK, buildTasks, taskView, judgeTask, helpText, praise, selfAnswer, selfWrong,
+      dek: 'Ironbark Sporting Goods owns an empty building in a shopping plaza and must decide whether to open its next store there. Wendell Achebe, the finance director, has a list of costs from around the company, and not all of them belong. You sort them, work out the taxes and build the store’s yearly cash flow, so Wendell can tell the real-estate committee whether to open or pass.',
+      whatBox: '',
+      stepsLine: 'Nine short steps. Each shows a worked example in the same table you fill in, then you do the same calculation with your own numbers.' },
+    steps: STEPS, quiz: QUIZ, walk: null, buildTasks, taskView, judgeTask, helpText, praise, selfAnswer, selfWrong,
     note: { title: 'A note for the real-estate committee', label: 'Your note to Wendell', minWords: 30, receiptHeading: 'Note to the finance director',
-      prompt: 'The real-estate committee meets tomorrow. Should Ironbark open the store? In one paragraph, give your answer and pick one item someone wanted counted that you left out (or one they forgot that you added). Say why.' },
+      prompt: 'The real-estate committee meets tomorrow. Should Ironbark open the plaza store? In one paragraph, give your answer and the NPV, then pick one item someone wanted counted that you left out and say why.' },
   };
 })(typeof window !== 'undefined' ? window : globalThis);
