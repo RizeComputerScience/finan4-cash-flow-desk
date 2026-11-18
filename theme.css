@@ -1,0 +1,67 @@
+/* The Relevant or Not? theme (FINAN IV Unit 6), 2026-11-18. Loaded after desk.css; changes the look only.
+   A sporting-goods store's back room: charcoal store signage and safety-orange price stickers on painted pegboard,
+   tall athletic sign lettering for the title, steps as tagged sorting bins (a finished one gets the orange sticker),
+   the memo as a strip of register tape with a torn edge, tables printed like a receipt. Dark mode is the stockroom after close. */
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Public+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Space+Mono:wght@400;700&display=swap');
+:root{
+  --bg:#E6E5E0;--surface:#FFFFFF;--panel:#F1F0EC;--line:#D2D0C8;--line-strong:#67645B;
+  --ink:#1F1D1A;--muted:#535048;--brand:#24221F;--brand-ink:#FFFFFF;--brand-tint:#FDE8DA;
+  --ok:#1D6B43;--ok-tint:#DFF1E6;--bad:#B0241B;--bad-tint:#FBE5E2;--hint:#3A4F66;--hint-tint:#E5EBF1;--focus:#1F1D1A;--hl:#FFE5B8;
+  --done:#F26B1D;--done-ink:#1F1D1A;--orange:#F26B1D;--orange-text:#A63B08;--holes:rgba(31,29,26,.17);
+  --receipt-frame:#B5420A;--receipt-paper:#FFFFFF;
+  --serif:'Public Sans','Helvetica Neue',Arial,sans-serif;--display:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
+  --mono:'Space Mono',ui-monospace,Menlo,monospace;}
+:root[data-theme="dark"]{
+  --bg:#221C17;--surface:#2D2620;--panel:#383029;--line:#4C4239;--line-strong:#A59885;
+  --ink:#F6F0E9;--muted:#CEC0AF;--brand:#FF8B42;--brand-ink:#221C17;--brand-tint:#43301F;
+  --ok:#7DD49A;--ok-tint:#15301F;--bad:#FF8D84;--bad-tint:#42201E;--hint:#B5C8DC;--hint-tint:#24303B;--focus:#FF8B42;--hl:#4D3A15;
+  --done:#FF8B42;--done-ink:#221C17;--orange:#FF8B42;--orange-text:#FF9F61;--holes:rgba(0,0,0,.42);}
+
+/* painted pegboard */
+body{font-size:17.5px;background-color:var(--bg);background-image:radial-gradient(circle,var(--holes) 2.6px,transparent 3.1px);background-size:26px 26px;background-position:13px 13px;
+  display:flex;flex-direction:column;min-height:100vh}
+header.bar{order:-2;background:var(--bg);border-bottom:6px solid var(--ink);box-shadow:0 3px 0 var(--orange)}
+:root[data-theme="dark"] header.bar{border-bottom-color:var(--line)}
+.brand{font-style:normal}
+.brand b{font:800 22px var(--display);letter-spacing:.02em}
+
+/* header art: only on the first screen */
+.desk-art{order:-1;display:none;width:calc(100% - 2.2rem);max-width:calc(820px - 2.2rem);height:auto;margin:1.8rem auto 0;border-radius:3px;border:5px solid var(--ink)}
+:root[data-theme="dark"] .desk-art{border-color:var(--line);filter:brightness(.88)}
+body:has(#startBox) .desk-art{display:block}
+@media (max-width:600px){.desk-art{aspect-ratio:2.2/1;object-fit:cover;object-position:48% 100%;border-width:4px}}
+
+/* steps as sorting-bin tags; a finished bin gets the orange sticker */
+nav.steps{padding-top:.6rem}
+nav.steps button{border-radius:2px;font:700 14px var(--serif);border:2px solid var(--ink);padding:.2rem .7rem}
+nav.steps button.done::before{content:"\2713\00a0";content:"\2713\00a0" / "done: "}
+nav.steps button[aria-current="step"]{outline:3px solid var(--focus);outline-offset:2px}
+
+/* type: tall store-sign lettering, an orange stripe under the title */
+h1{font:900 clamp(50px,8.6vw,84px)/.92 var(--display);color:var(--ink);letter-spacing:.005em}
+h1::after{content:"";display:block;width:5.5rem;height:8px;margin-top:.7rem;background:var(--orange)}
+h2{font:800 34px/1.05 var(--display);letter-spacing:.01em}
+.kicker{font-style:normal;font-weight:700;font-size:16px;color:var(--orange-text)}
+.dek{font-size:18.5px;font-style:normal;color:var(--ink);max-width:36em}
+.points{font:900 60px/1 var(--display);color:var(--ink)}
+
+/* cards: the box is a bin label, the memo a strip of register tape with a torn edge */
+.box{border-radius:2px;background:var(--surface);border:2px solid var(--ink);box-shadow:5px 5px 0 var(--orange)}
+.memo{position:relative;border-radius:0;border:0;box-shadow:0 2px 0 var(--line);margin-bottom:1.6rem}
+.memo::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:8px;
+  background:conic-gradient(from -45deg at 50% 100%,var(--surface) 90deg,transparent 0) 0 0/16px 8px repeat-x}
+.memo-head{border-bottom:2px dashed var(--line-strong)}
+.stamp{border-radius:2px;color:var(--orange-text)}
+.btn,.btn-calc,.btn-quiet{border-radius:2px}
+.btn{font-weight:800;letter-spacing:.01em}
+.choice span{border-radius:2px;border-width:2px}
+
+/* tables: printed like the register tape */
+table.cf{font-family:var(--mono)}
+table.cf th{font:700 14px var(--serif);color:var(--ink);border-bottom:2px dashed var(--ink)}
+table.cf caption{font-style:normal;font-weight:700}
+table.cf td.lbl{font-family:var(--serif)}
+table.cf tfoot tr.total td{border-top:2px dashed var(--ink);border-bottom:4px double var(--ink)}
+.formula{border-radius:0;border-left:5px solid var(--orange)}
+.calc-strip{border-left-color:var(--orange);border-radius:0}
+details.example{border-left-color:var(--orange);border-radius:0}

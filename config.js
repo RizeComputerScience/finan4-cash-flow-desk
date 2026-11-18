@@ -9,25 +9,28 @@
      steps and a check) and financing costs (loan interest, a step part and a check).
    - Added: hiring and training staff as a start-up cost that counts but is not depreciated (project kit Step 1 has a pre-opening
      cost row), and the NPV and open-or-pass decision as the last step, on the annuity factor from Units 4 and 5.
-   The previous version is in v2-archive/. seedVersion 3 and version 3: progress and receipts from v2 do not carry over. */
+   The previous version is in v2-archive/. seedVersion 3 and version 3: progress and receipts from v2 do not carry over.
+   2026-11-18 (design/AUDREY-REVIEW-BRIEF-2026-11-18.md): wording only, to use the industry names the reading now teaches
+   (incremental cash flows, erosion or cannibalization, depreciation tax shield). Step logic, seeds and answers unchanged, so the
+   version stays 3. The pre-edit file is v3-archive/config.v-2026-11-18.js. */
 (function (root) {
   'use strict';
   const QUIZ = [
-    { title: 'Quick check: a new manager',
+    { title: 'Quick check: incremental or not?',
       q: 'If the plaza store opens, Ironbark will hire one more district manager at $90,000 a year, and head office will pay her salary. Does the salary belong in the store’s cash flows?',
       options: ['Yes. Ironbark’s cash changes because the store opens', 'No. Head-office costs are overhead, so they stay out', 'No. Head office pays it, not the store', 'Only in years when the store makes a profit'],
       answer: 0,
-      why: ['Right. Ask the one question: does Ironbark’s cash change because the store opens? The salary is paid only if it opens, so it counts.',
-        'Overhead stays out only when head office costs the same either way. This salary is new, and it exists only because the store opens.',
+      why: ['Right. The salary is paid only if the store opens, so it is an incremental cash flow and counts.',
+        'Allocated overhead stays out only when head office costs the same either way. This salary is new, and it exists only because the store opens.',
         'Who writes the check does not matter. Ironbark pays $90,000 a year more because the store opens, so it counts.',
         'The salary is paid every year the store is open, profit or not. It counts every year.'] },
     { title: 'Exam-style question',
       q: 'A competitor spends $240,000 on fixtures for a new store and depreciates them evenly over 6 years. Its tax rate is 21%. How much does depreciation save it in taxes each year?',
       options: ['$8,400', '$50,400', '$40,000', '$31,600'],
       answer: 0,
-      why: ['Right. Depreciation each year = $240,000 ÷ 6 = $40,000, and the tax saving = $40,000 × 21% = $8,400. Questions on the exams look like this one.',
+      why: ['Right. Depreciation each year = $240,000 ÷ 6 = $40,000, and the depreciation tax shield = $40,000 × 21% = $8,400. Questions on the exams look like this one.',
         '$50,400 is 21% of the whole $240,000. Spread the cost over 6 years first: $40,000 a year, then × 21%.',
-        '$40,000 is the depreciation itself. The tax saving is depreciation × tax rate: $40,000 × 21%.',
+        '$40,000 is the depreciation itself. The tax shield is depreciation × tax rate: $40,000 × 21%.',
         '$31,600 multiplies the depreciation by 79%. Multiply by the tax rate, 21%, instead.'] },
   ];
 
@@ -35,8 +38,8 @@
     { id: 'open', label: 'Start-up cash', kind: 'task' },
     { id: 'yearly', label: 'Each year', kind: 'task' },
     { id: 'q1', label: 'Quick check', kind: 'check', quiz: 0 },
-    { id: 'tax1', label: 'Outlet taxes', kind: 'task' },
-    { id: 'tax2', label: 'Plaza taxes', kind: 'task' },
+    { id: 'tax1', label: 'Outlet tax shield', kind: 'task' },
+    { id: 'tax2', label: 'Plaza tax shield', kind: 'task' },
     { id: 'cf1', label: 'Outlet NPV', kind: 'task' },
     { id: 'cf2', label: 'Open or pass?', kind: 'task' },
     { id: 'q2', label: 'Exam-style question', kind: 'check', quiz: 1 },
@@ -71,7 +74,7 @@
     tax: (o, mode) => [
       { key: 'T', label: 'Taxes on the yearly cash', calc: mode === 'own' ? 'yearly cash before tax × tax rate' : `${m(o.O)} × ${pc(o.t)}`, value: o.O * o.t, input: mode === 'own' },
       { key: 'D', label: 'Depreciation each year', calc: mode === 'own' ? `build-out and fixtures ÷ ${LIFE} years` : `${m(o.BF)} ÷ ${LIFE} years`, value: o.BF / LIFE, input: mode === 'own' },
-      { key: 'Sv', label: 'Tax saving from depreciation', calc: mode === 'own' ? 'depreciation × tax rate' : `${m(o.BF / LIFE)} × ${pc(o.t)}`, value: o.BF / LIFE * o.t, input: true }],
+      { key: 'Sv', label: 'Depreciation tax shield', calc: mode === 'own' ? 'depreciation × tax rate' : `${m(o.BF / LIFE)} × ${pc(o.t)}`, value: o.BF / LIFE * o.t, input: true }],
     cf: (o, mode) => {
       const T = o.O * o.t, D = o.BF / LIFE, Sv = D * o.t, CF = o.O - T + Sv - o.M, f = af4(o.r), PV = CF * f, npv = -o.start + PV;
       const nums = mode !== 'own';
@@ -79,9 +82,9 @@
         { key: 'O', label: 'Yearly cash before tax', calc: 'given', value: o.O },
         { key: 'T', label: 'Taxes on the yearly cash', calc: 'cash before tax × tax rate', value: T },
         { key: 'D', label: 'Depreciation each year', calc: `build-out ÷ ${LIFE} years`, value: D },
-        { key: 'Sv', label: 'Tax saving from depreciation', calc: 'depreciation × tax rate', value: Sv },
+        { key: 'Sv', label: 'Depreciation tax shield', calc: 'depreciation × tax rate', value: Sv },
         { key: 'M', label: 'Maintenance capex', calc: 'racks and repairs', value: o.M },
-        { key: 'CF', label: `Cash flow, each of years 1 to ${LIFE}`, calc: nums ? `${m(o.O)} − ${m(T)} + ${m(Sv)} − ${m(o.M)}` : 'cash before tax − taxes + tax saving − maintenance capex', value: CF, input: true },
+        { key: 'CF', label: `Cash flow, each of years 1 to ${LIFE}`, calc: nums ? `${m(o.O)} − ${m(T)} + ${m(Sv)} − ${m(o.M)}` : 'cash before tax − taxes + tax shield − maintenance capex', value: CF, input: true },
         { key: 'PV', label: `Value today of years 1 to ${LIFE}`, calc: nums ? `${m(CF)} × ${f4(f)}` : `cash flow each year × ${f4(f)}`, value: PV, input: mode === 'own' },
         { key: 'Y0', label: 'Year 0 cash flow', calc: nums ? 'start-up cash, going out' : `start-up cash, ${m(o.start)}, going out`, value: -o.start, input: mode === 'own' },
         { key: 'NPV', label: 'NPV', calc: nums ? `${m(-o.start)} + ${m(PV)}` : 'year 0 cash flow + value today', value: npv, input: true }];
@@ -124,14 +127,14 @@
       O: [[t.P, 'none', `Subtract the amounts that count: ${m(t.P)} − ${m(t.E)} − ${m(t.R)}.`], [t.P - t.E - t.R - t.A, 'overhead', `Leave the ${m(t.A)} head-office share out. Head office costs the same either way.`],
         [t.P - t.E, 'norent', `Subtract the gym’s ${m(t.R)} of rent too. Ironbark gives it up if the store opens.`], [t.P - t.R, 'noerosion', `Subtract the nearby store’s ${m(t.E)} of lost profit too.`],
         [t.P - t.E - t.A, 'swap', `The gym’s ${m(t.R)} counts and the ${m(t.A)} head-office share does not. ${m(t.P)} − ${m(t.E)} − ${m(t.R)}.`], [t.P + t.E + t.R, 'added', 'Both items lower Ironbark’s cash, so subtract them.']],
-      T: [[o.O * (1 - o.t), 'after', `That is the cash left after tax. Type the tax itself: ${m(o.O)} × ${pc(o.t)}.`], [(o.O - D) * o.t, 'net', `That takes depreciation off first. The tax saving has its own line, so tax the whole ${m(o.O)}.`]],
+      T: [[o.O * (1 - o.t), 'after', `That is the cash left after tax. Type the tax itself: ${m(o.O)} × ${pc(o.t)}.`], [(o.O - D) * o.t, 'net', `That takes depreciation off first. The tax shield has its own line, so tax the whole ${m(o.O)}.`]],
       D: [[o.BF, 'nodiv', `Spread the cost evenly over ${LIFE} years: ${m(o.BF)} ÷ ${LIFE}.`], [(o.BF + o.Tr) / LIFE, 'train', `Depreciate only the build-out and fixtures. The ${m(o.Tr)} of training is spent at once.`],
         [(o.BF + o.Tr + t.S) / LIFE, 'all', `Depreciate only the build-out and fixtures, ${m(o.BF)}.`], [o.BF / (LIFE - 1), 'years', `Divide by the store’s full ${LIFE}-year life: ${m(o.BF)} ÷ ${LIFE}.`]],
-      Sv: [[D, 'dep', `That is the depreciation itself. The saving is depreciation × tax rate: ${m(D)} × ${pc(o.t)}.`], [D * (1 - o.t), 'oneminus', `Multiply by the tax rate, ${pc(o.t)}, not by ${pc(1 - o.t)}.`],
+      Sv: [[D, 'dep', `That is the depreciation itself. The tax shield is depreciation × tax rate: ${m(D)} × ${pc(o.t)}.`], [D * (1 - o.t), 'oneminus', `Multiply by the tax rate, ${pc(o.t)}, not by ${pc(1 - o.t)}.`],
         [o.BF * o.t, 'whole', `That is the tax rate times the whole ${m(o.BF)}. Use one year’s depreciation, ${m(D)}.`]],
-      CF: [[o.O - T - o.M, 'noshield', `Add the ${m(Sv)} tax saving from depreciation.`], [o.O - T + Sv, 'nomaint', `Subtract the ${m(o.M)} of maintenance capex too.`],
-        [CF - D, 'dep', `Depreciation is not cash leaving, so do not subtract the ${m(D)}. It enters only through the tax saving.`], [o.O - T - D - o.M, 'depnotsaving', `Use the ${m(Sv)} tax saving, added, in place of the ${m(D)} of depreciation.`],
-        [o.O - T - Sv - o.M, 'shieldsign', `The tax saving lowers the tax bill, so add the ${m(Sv)}.`], [o.O - T + D - o.M, 'depadded', `Add the tax saving, ${m(Sv)}, not the depreciation itself.`], [o.O - o.M + Sv, 'notax', `Subtract the ${m(T)} of taxes too.`]],
+      CF: [[o.O - T - o.M, 'noshield', `Add the ${m(Sv)} depreciation tax shield.`], [o.O - T + Sv, 'nomaint', `Subtract the ${m(o.M)} of maintenance capex too.`],
+        [CF - D, 'dep', `Depreciation is not cash leaving, so do not subtract the ${m(D)}. It enters only through the tax shield.`], [o.O - T - D - o.M, 'depnotsaving', `Use the ${m(Sv)} tax shield, added, in place of the ${m(D)} of depreciation.`],
+        [o.O - T - Sv - o.M, 'shieldsign', `The tax shield lowers the tax bill, so add the ${m(Sv)}.`], [o.O - T + D - o.M, 'depadded', `Add the tax shield, ${m(Sv)}, not the depreciation itself.`], [o.O - o.M + Sv, 'notax', `Subtract the ${m(T)} of taxes too.`]],
       PV: [[CF * LIFE, 'nodisc', `That adds ${LIFE} years without discounting. Multiply the cash flow by the annuity factor, ${f4(f)}.`], [CF / f, 'div', `Multiply by the annuity factor, ${f4(f)}; don’t divide.`]],
       Y0: [[-(o.start + t.S), 'sunk', `Leave the ${m(t.S)} survey out of year 0. It was already paid.`], [-o.BF, 'notrain', `Year 0 includes the ${m(o.Tr)} of training as well: −${m(o.start)}.`]],
       NPV: [[PV + o.start, 'y0sign', `Year 0 is cash going out: ${m(-o.start)} + ${m(PV)}.`], [CF * LIFE - o.start, 'nodisc', `Discount the yearly cash flows first: ${m(CF)} × ${f4(f)}, then add year 0.`], [PV, 'noy0', `Add the year 0 cash flow, ${m(-o.start)}.`]],
@@ -205,9 +208,9 @@
       body: '<p>Wendell needs the store’s start-up cash for year 0. In the Result column, type the amount that counts, or 0 for an item that stays out. Two lines are done for you.</p>' }),
     yearly: (t) => ({ title: 'What does the store add each year?', place: 'Every new store changes the stores and buildings around it.',
       body: '<p>Wendell has three more items. Type the amount each one takes from the store’s yearly cash, or 0 if it stays out. Then find the yearly cash before tax.</p>' }),
-    tax1: (t) => ({ title: 'Taxes on the outlet store', place: 'Ironbark is also weighing a smaller outlet store by the highway.',
-      body: `<p>The outlet would add <b>${m(t.O2)}</b> a year before tax. Ironbark pays <b>${pc(t.t)}</b> tax, and the outlet’s build-out and fixtures, <b>${m(t.B2)}</b>, are depreciated over ${LIFE} years. What is the tax saving? Two lines are done for you.</p>` }),
-    tax2: (t) => ({ title: 'Taxes on the plaza store', place: 'Back to the plaza store.',
+    tax1: (t) => ({ title: 'The outlet’s tax shield', place: 'Ironbark is also weighing a smaller outlet store by the highway.',
+      body: `<p>The outlet would add <b>${m(t.O2)}</b> a year before tax. Ironbark pays <b>${pc(t.t)}</b> tax, and the outlet’s build-out and fixtures, <b>${m(t.B2)}</b>, are depreciated over ${LIFE} years. What is its depreciation tax shield? Two lines are done for you.</p>` }),
+    tax2: (t) => ({ title: 'The plaza store’s tax shield', place: 'Back to the plaza store.',
       body: `<p>The plaza store adds <b>${m(t.O)}</b> a year before tax. Its build-out and fixtures, <b>${m(t.B)}</b>, are depreciated over ${LIFE} years, and the tax rate is <b>${pc(t.t)}</b>. Fill in all three lines.</p>` }),
     cf1: (t) => ({ title: 'The outlet’s NPV', place: 'Wendell wants one number for the outlet: its NPV.',
       body: `<p>The outlet’s start-up cash is <b>${m(t.B2 + t.Tr2)}</b> and its maintenance capex <b>${m(t.M2)}</b> a year. At Ironbark’s required <b>${pc(t.r)}</b>, the annuity factor for ${LIFE} years is <b>${f4(af4(t.r))}</b>. Find the cash flow each year and the NPV.</p>` }),
@@ -246,9 +249,9 @@
   function praise(t) {
     const p = PLAZA(t), o = OUTLET(t);
     if (t.id === 'open') return `Year 0 starts at ${m(t.B + t.Tr)}. The ${m(t.S)} survey is a <b>sunk cost</b>: already spent, so it cannot change the decision.`;
-    if (t.id === 'yearly') return `The nearby store’s lost profit is <b>erosion</b> and the gym’s rent is an <b>opportunity cost</b>: both count. The head-office share is <b>allocated overhead</b> and stays out. The store adds ${m(t.O)} a year before tax.`;
-    if (t.id === 'tax1') return `Depreciation cuts the outlet’s tax bill by ${m(o.BF / LIFE * o.t)} a year, though no cash leaves when it is recorded.`;
-    if (t.id === 'tax2') return `Over ${LIFE} years the tax saving adds up to ${m(p.BF * p.t)}, so the government effectively pays ${pc(p.t)} of the ${m(p.BF)} build-out and fixtures.`;
+    if (t.id === 'yearly') return `The nearby store’s lost profit is <b>erosion</b> (or <b>cannibalization</b>) and the gym’s rent is an <b>opportunity cost</b>: both count. The head-office share is <b>allocated overhead</b> and stays out. The store adds ${m(t.O)} a year before tax.`;
+    if (t.id === 'tax1') return `The outlet’s depreciation tax shield is ${m(o.BF / LIFE * o.t)} a year: depreciation cuts the tax bill, though no cash leaves when it is recorded.`;
+    if (t.id === 'tax2') return `Over ${LIFE} years the tax shield adds up to ${m(p.BF * p.t)}, so the government effectively pays ${pc(p.t)} of the ${m(p.BF)} build-out and fixtures.`;
     if (t.id === 'cf1') { const n = linesFor(t).find((l) => l.key === 'NPV').value; return `The outlet’s NPV is ${m(n)}, so on these numbers it ${n > 0 ? 'is worth opening' : 'is not worth opening'}.`; }
     if (t.id === 'cf2') return `The plaza store’s NPV is ${m(t.npv)}, so ${t.decision === 'open' ? 'it adds value: open it' : 'it would lose value: pass'}.`;
   }
@@ -268,11 +271,11 @@
     calcPlaceholder: '600000*0.25/5',
     story: { title: 'Relevant or Not?', kicker: 'Corporate Finance, Unit 6', company: 'Ironbark Sporting Goods', team: 'Finance',
       from: 'Wendell Achebe', fromTitle: 'finance director, Ironbark Sporting Goods',
-      dek: 'Ironbark Sporting Goods owns an empty building in a shopping plaza and must decide whether to open its next store there. Wendell Achebe, the finance director, has a list of costs from around the company, and not all of them belong. You sort them, work out the taxes and build the store’s yearly cash flow, so Wendell can tell the real-estate committee whether to open or pass.',
+      dek: 'Ironbark Sporting Goods owns an empty building in a shopping plaza and must decide whether to open its next store there. Wendell Achebe, the finance director, has a list of costs from around the company, and only the incremental cash flows belong in the store’s NPV. You sort them, work out the taxes and build the store’s yearly cash flow, so Wendell can tell the real-estate committee whether to open or pass.',
       whatBox: '',
       stepsLine: 'Nine short steps. Each shows a worked example in the same table you fill in, then you do the same calculation with your own numbers.' },
     steps: STEPS, quiz: QUIZ, walk: null, buildTasks, taskView, judgeTask, helpText, praise, selfAnswer, selfWrong,
     note: { title: 'A note for the real-estate committee', label: 'Your note to Wendell', minWords: 30, receiptHeading: 'Note to the finance director',
-      prompt: 'The real-estate committee meets tomorrow. Should Ironbark open the plaza store? In one paragraph, give your answer and the NPV, then pick one item someone wanted counted that you left out and say why.' },
+      prompt: 'The real-estate committee meets tomorrow. Should Ironbark open the plaza store? In one paragraph, give your answer and the NPV, then pick one item someone wanted counted that you left out and say why it is not an incremental cash flow.' },
   };
 })(typeof window !== 'undefined' ? window : globalThis);
